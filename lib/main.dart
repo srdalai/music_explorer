@@ -1,10 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:music_explorer/home_page.dart';
 import 'package:music_explorer/main_page.dart';
+import 'package:music_explorer/musics_page.dart';
+import 'package:music_explorer/profile_page.dart';
+import 'package:music_explorer/search_page.dart';
 
 void main() => runApp(MusicExplorer());
 
 class MusicExplorer extends StatelessWidget {
   // This widget is the root of your application.
+
+  final navigatorKey = GlobalKey<NavigatorState>();
+  final pagesRouteFactories = {
+    "/": () => MaterialPageRoute(
+          builder: (context) => HomePage(),
+        ),
+    "musics": () => MaterialPageRoute(
+          builder: (context) => MusicsPage()
+        ),
+    "search": () => MaterialPageRoute(
+          builder: (context) => SearchPage()
+        ),
+    "profile": () => MaterialPageRoute(
+          builder: (context) => ProfilePage()
+        ),
+  };
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,9 +42,30 @@ class MusicExplorer extends StatelessWidget {
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
         primarySwatch: Colors.blueGrey,
+        primaryIconTheme: IconThemeData(color: Colors.white),
         primaryTextTheme: Typography.whiteMountainView
       ),
-      home: MainPage(),
+      home:MainPage(),
     );
   }
+
+  Widget _buildBody() =>
+      MaterialApp(
+        navigatorKey: navigatorKey,
+        onGenerateRoute: (route) => pagesRouteFactories[route.name]()
+        );
+
+  Widget _buildBottomNavigationBar(context) => BottomNavigationBar(
+        items: [
+          _buildBottomNavigationBarItem("Home", Icons.home),
+          _buildBottomNavigationBarItem("Musics", Icons.music_note),
+          _buildBottomNavigationBarItem("Search", Icons.search),
+          _buildBottomNavigationBarItem("Profile", Icons.person_outline)
+        ],
+        onTap: (routeIndex) =>
+            navigatorKey.currentState.pushNamed(pagesRouteFactories.keys.toList()[routeIndex]),
+      );
+
+  _buildBottomNavigationBarItem(name, icon) => BottomNavigationBarItem(
+      icon: Icon(icon), title: Text(name), backgroundColor: Colors.grey.shade900);
 }

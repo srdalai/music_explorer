@@ -10,7 +10,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  int _currentIndex = 0;
+  int _currentIndex = 1;
   final List<Widget> _children = [
     HomePage(),MusicsPage(),SearchPage(),ProfilePage()
   ];
@@ -18,6 +18,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0.0,),
       backgroundColor: Colors.grey.shade800,
       body: _children[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
