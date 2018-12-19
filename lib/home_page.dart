@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:music_explorer/music_player.dart';
+import 'package:marquee/marquee.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,17 +13,122 @@ class _HomePageState extends State<HomePage> {
     return Column(
       children: <Widget>[
         Expanded(
-          child: Container(),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 56.0, left: 56.0, right: 56.0),
+            child: Card(
+              color: Colors.grey.shade500,
+              child: Container(),
+            ),
+          ),
         ),
+        SizedBox(height: 30.0,),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text("Playlists", style: TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.bold),),
+              Text("more",style: TextStyle(color: Colors.white, fontSize: 16.0))
+            ],
+          ),
+        ),
+        buildPlaylist(),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text("New Musics", style: TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.bold),),
+              Text("more",style: TextStyle(color: Colors.white, fontSize: 16.0))
+            ],
+          ),
+        ),
+        buildMaterial(),
         //bottomPlayer(),
       ],
+    );
+  }
+
+  Widget buildMaterial() {
+    return Container(
+      height: 200.0,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: 10,
+        itemBuilder: (context, position) {
+          return Container(
+            margin: EdgeInsets.all(12.0),
+            width: 120.0,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: Image.asset(
+                    "assets/selena.jpg",
+                    width: 120.0,
+                    height: 120.0,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                SizedBox(
+                  height: 8.0,
+                ),
+                Text(
+                  "Start Dance",
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(
+                  height: 4.0,
+                ),
+                Text(
+                  "Selena Gomez Selena",
+                  style: TextStyle(color: Colors.white),
+                  overflow: TextOverflow.ellipsis,
+                )
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget buildPlaylist() {
+    return Container(
+      height: 100.0,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: 5,
+        itemBuilder: (context, position) {
+          return Container(
+            margin: EdgeInsets.all(12.0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: Image.asset(
+                "assets/selena.jpg",
+                width: 180.0,
+                height: 100.0,
+                fit: BoxFit.cover,
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
   Widget bottomPlayer() {
     return Material(
       color: Colors.grey.shade700,
-          child: SizedBox(
+      child: SizedBox(
         width: MediaQuery.of(context).size.width,
         height: 60.0,
         child: Row(
@@ -34,15 +140,13 @@ class _HomePageState extends State<HomePage> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(4.0),
                 child: Material(
-                  child:
-                      Image.asset("assets/selena.jpg", fit: BoxFit.cover),
+                  child: Image.asset("assets/selena.jpg", fit: BoxFit.cover),
                 ),
               ),
             ),
             Expanded(
               child: Padding(
-                padding:
-                    EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
+                padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisSize: MainAxisSize.max,
@@ -60,8 +164,7 @@ class _HomePageState extends State<HomePage> {
                       height: 5.0,
                     ),
                     Text("Selena Gomez",
-                        style: TextStyle(
-                            color: Colors.white70, fontSize: 16.0))
+                        style: TextStyle(color: Colors.white70, fontSize: 16.0))
                   ],
                 ),
               ),
@@ -71,7 +174,9 @@ class _HomePageState extends State<HomePage> {
                 iconSize: 36.0,
                 color: Colors.white,
                 icon: Icon(Icons.play_circle_filled),
-                onPressed: () {print("Hello");},
+                onPressed: () {
+                  print("Hello");
+                },
               ),
             )
           ],
