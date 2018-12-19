@@ -12,45 +12,61 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 1;
   final List<Widget> _children = [
-    HomePage(),MusicsPage(),SearchPage(),ProfilePage()
+    HomePage(),
+    MusicsPage(),
+    SearchPage(),
+    ProfilePage()
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0.0,),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0.0,
+      ),
       backgroundColor: Colors.grey.shade800,
       body: _children[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: onTabTapped,
-        type: BottomNavigationBarType.shifting,
-        currentIndex: _currentIndex,
-        fixedColor: Colors.grey,
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              title: Text("Home"),
-              backgroundColor: Colors.grey.shade900),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.music_note),
-              title: Text("Music"),
-              backgroundColor: Colors.grey.shade900),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.search),
-              title: Text("Search"),
-              backgroundColor: Colors.grey.shade900),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              title: Text("Profile"),
-              backgroundColor: Colors.grey.shade900)
-        ],
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+          canvasColor: Colors.grey.shade900,
+          primaryColor: Colors.red,
+          textTheme: Theme
+            .of(context)
+            .textTheme
+            .copyWith(caption: new TextStyle(color: Colors.white70))
+        ),
+        child: BottomNavigationBar(
+          onTap: onTabTapped,
+          type: BottomNavigationBarType.fixed,
+          currentIndex: _currentIndex,
+          fixedColor: Colors.white,
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                title: Text("Home")
+              ),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.music_note),
+                title: Text("Music")
+              ),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.search),
+                title: Text("Search")
+              ),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.person_outline),
+                title: Text("Profile")
+              )
+          ],
+        ),
       ),
     );
   }
 
   void onTabTapped(int index) {
     setState(() {
-          _currentIndex = index;
-        });
+      _currentIndex = index;
+    });
   }
 }
