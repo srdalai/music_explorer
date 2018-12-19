@@ -136,7 +136,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
               borderRadius: BorderRadius.circular(12.0),
               child: Material(
                 elevation: 8.0,
-                child: Image.file(new File(_song.albumArt), fit: BoxFit.cover)
+                child: _song.albumArt == null ? Image.asset("assets/selena.jpg", fit: BoxFit.cover) : Image.file(new File(_song.albumArt), fit: BoxFit.cover)
                 // child: Image.asset("assets/selena.jpg", fit: BoxFit.cover),
               ),
             ),
