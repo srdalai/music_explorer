@@ -11,10 +11,11 @@ import 'package:audioplayer/audioplayer.dart';
 enum PlayerState { stopped, playing, paused }
 
 class MiniPlayer extends StatefulWidget {
-
   final Song song;
-  final ValueListenable<int> songListener;
-  const MiniPlayer({Key key, this.song, this.songListener}) : super(key: key);
+  final StreamController<Song> streamController;
+  const MiniPlayer(
+      {Key key, this.song, this.streamController})
+      : super(key: key);
 
   @override
   _MiniPlayerState createState() => _MiniPlayerState();
@@ -25,6 +26,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
   Song _song;
   String _albumArt, _artist, _album, _title;
   int _duration;
+  StreamController<Song> _streamController;
 
   Duration duration;
   Duration position;
@@ -51,10 +53,24 @@ class _MiniPlayerState extends State<MiniPlayer> {
     // TODO: implement initState
     super.initState();
     _song = widget.song;
-    if (audioPlayer != null) {
-      disVow();
-    }
+    
+    _streamController = widget.streamController;
+    _streamController.stream.listen((song) {
+      print(song.title);
+      //_stop();
+      //disVow();
+      changeSong(song);
+    });
     initAudioPlayer();
+  }
+
+  void changeSong(Song song) {
+    _stop();
+    setState(() {
+      _song = song;
+    });
+    _playLocal();
+    //initAudioPlayer();
   }
 
   @override
@@ -120,7 +136,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
         onComplete();
         setState(() {
           position = duration;
-           _positionSubscription.cancel();
+          _positionSubscription.cancel();
           _audioPlayerStateSubscription.cancel();
           audioPlayer.stop();
         });
@@ -138,10 +154,18 @@ class _MiniPlayerState extends State<MiniPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    return bottomPlayer();
+    return new StreamBuilder(
+      initialData: _song,
+      stream: _streamController.stream,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return bottomPlayer(snapshot.data);
+        }
+      },
+    );
   }
 
-  Widget bottomPlayer() {
+  Widget bottomPlayer(Song nowSong) {
     return Material(
       color: Colors.grey.shade700,
       child: SizedBox(
@@ -156,7 +180,10 @@ class _MiniPlayerState extends State<MiniPlayer> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(4.0),
                 child: Material(
-                  child: _song.albumArt == null ? Image.asset("assets/selena.jpg", fit: BoxFit.cover) : Image.file(new File(_song.albumArt), fit: BoxFit.cover),
+                  child: nowSong.albumArt == null
+                      ? Image.asset("assets/selena.jpg", fit: BoxFit.cover)
+                      : Image.file(new File(nowSong.albumArt),
+                          fit: BoxFit.cover),
                 ),
               ),
             ),
@@ -169,7 +196,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Text(
-                      _title,
+                      nowSong.title,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                           color: Colors.white,
@@ -179,7 +206,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
                     SizedBox(
                       height: 5.0,
                     ),
-                    Text(widget.songListener == null ? _artist : widget.songListener.value.toString(),
+                    Text(nowSong.artist,
                         style: TextStyle(color: Colors.white70, fontSize: 16.0))
                   ],
                 ),
@@ -188,11 +215,14 @@ class _MiniPlayerState extends State<MiniPlayer> {
             Center(
               child: IconButton(
                 onPressed: () {
-              isPlaying ? _pause() : _playLocal();
-            },
-            iconSize: 42.0,
-            icon: Icon(isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
-                color: Colors.white),
+                  isPlaying ? _pause() : _playLocal();
+                },
+                iconSize: 42.0,
+                icon: Icon(
+                    isPlaying
+                        ? Icons.pause_circle_filled
+                        : Icons.play_circle_filled,
+                    color: Colors.white),
               ),
             )
           ],

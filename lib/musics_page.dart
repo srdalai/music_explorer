@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flute_music_player/flute_music_player.dart';
@@ -19,6 +20,8 @@ class _MusicsPageState extends State<MusicsPage> {
   MusicFinder audioPlayer;
   bool isPlaying = false;
   bool isLoded = false;
+  StreamController<Song> controller;
+  
 
   @override
   void initState() {
@@ -26,8 +29,16 @@ class _MusicsPageState extends State<MusicsPage> {
     super.initState();
     isPlaying = false;
     isLoded = false;
+    controller = new StreamController.broadcast();
     initPlayer();
   }
+
+  @override
+  void dispose() {
+      // TODO: implement dispose
+      controller.close();
+      super.dispose();
+    }
 
   void initPlayer() async {
     audioPlayer = new MusicFinder();
@@ -49,7 +60,10 @@ class _MusicsPageState extends State<MusicsPage> {
         alignment: Alignment.bottomCenter,
         children: <Widget>[
           isLoded ? buildGridView() : Container(),
-          isPlaying ? MiniPlayer(song: _song,) : Container()
+          SizedBox(
+            height: 60.0,
+            child: isPlaying ? MiniPlayer(song: _song, streamController: controller,) : Container(),
+          )
         ],
       ),
     );
@@ -61,13 +75,7 @@ class _MusicsPageState extends State<MusicsPage> {
     return GridView.count(
       crossAxisCount: 2,
       children: List.generate(_songs.length, (index) {
-        return ValueListenableBuilder<int>(
-        valueListenable: number,
-        builder: (context, value, child) {
-          return buildPadding(width, index);
-        },
-      );
-        //return buildPadding(width, index);
+        return buildPadding(width, index);
       }),
     );
   }
@@ -87,9 +95,8 @@ class _MusicsPageState extends State<MusicsPage> {
                   child: InkWell(
                     splashColor: Colors.redAccent,
                     onTap: () {
-
+                      controller.sink.add(_songs[index]);
                       
-                      number.value++;
                       setState(() {
                         isPlaying = true;
                         _song = _songs[index];
