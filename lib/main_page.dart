@@ -1,63 +1,75 @@
+import 'dart:async';
+
+import 'package:flute_music_player/flute_music_player.dart';
 import 'package:flutter/material.dart';
 import 'package:music_explorer/home_page.dart';
+import 'package:music_explorer/models/models.dart';
 import 'package:music_explorer/musics_page.dart';
 import 'package:music_explorer/profile_page.dart';
 import 'package:music_explorer/search_page.dart';
 import 'package:music_explorer/widgets/miniPlayer.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class MainPage extends StatefulWidget {
   @override
   _MainPageState createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin{
   int _currentIndex = 0;
-  final List<Widget> _children = [
+  bool shouldChange = true;
+  StreamController<Song> controller;
+  List<Widget> _children = [
     HomePage(),
     MusicsPage(),
     SearchPage(),
     ProfilePage()
   ];
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  VoidCallback _showPersBottomSheetCallBack;
+
+
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _showPersBottomSheetCallBack = _showBottomSheet;
+
+    _children = [
+    HomePage(),
+    MusicsPage(),
+    SearchPage(),
+    ProfilePage()
+  ];
+
+  controller = new StreamController.broadcast();
+  shouldChange = true;
   }
 
-  void _showBottomSheet() {
-    setState(() {
-      _showPersBottomSheetCallBack = null;
-    });
+  @override
+  void dispose() {
+      // TODO: implement dispose
+      controller.close();
+      super.dispose();
+    }
 
-    _scaffoldKey.currentState
-        .showBottomSheet((context) {
-          return MiniPlayer();
-        })
-        .closed
-        .whenComplete(() {
-          if (mounted) {
-            setState(() {
-              _showPersBottomSheetCallBack = _showBottomSheet;
-            });
-          }
-        });
-  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
       backgroundColor: Colors.grey.shade800,
       body: Stack(
         alignment: Alignment.bottomCenter,
         children: <Widget>[
           _children[_currentIndex],
-          //MiniPlayer()
+          ScopedModelDescendant<SongModel>(
+            rebuildOnChange: false,
+            builder: (context, _, model) {
+              print(model.song.title);
+              controller.sink.add(model.song);
+              return MiniPlayer(song: model.song, streamController: controller);
+             },
+          )
           // RaisedButton(
           //   onPressed: _showPersBottomSheetCallBack,
           //   child: Text("Click Me"),
@@ -81,6 +93,7 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
+
   final List<BottomNavigationBarItem> bottomNavitems =
       <BottomNavigationBarItem>[
     BottomNavigationBarItem(icon: Icon(Icons.home), title: Text("Home")),
@@ -93,65 +106,36 @@ class _MainPageState extends State<MainPage> {
   void onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
+      shouldChange = false;
     });
   }
+}
 
-  Widget bottomPlayer() {
-    return Material(
-      color: Colors.grey.shade700,
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        height: 60.0,
-        child: Row(
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 4.0),
-              width: 48.0,
-              height: 48.0,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4.0),
-                child: Material(
-                  child: Image.asset("assets/selena.jpg", fit: BoxFit.cover),
-                ),
-              ),
+
+class NewHomePage extends StatelessWidget {
+
+  final StreamController<Song> controller = new StreamController.broadcast();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Stack(
+        alignment: Alignment.bottomCenter,
+        children: <Widget>[
+          MainPage(),
+          Container(
+            margin: EdgeInsets.only(bottom: 56.0),
+            child: ScopedModelDescendant<SongModel>(
+              rebuildOnChange: false,
+              builder: (context, _, model) {
+                print(model.song.title);
+                controller.sink.add(model.song);
+                return MiniPlayer(song: model.song, streamController: controller);
+              },
             ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      "Slow Down Slow Down Slow Down Slow Down Slow Down",
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(
-                      height: 5.0,
-                    ),
-                    Text("Selena Gomez",
-                        style: TextStyle(color: Colors.white70, fontSize: 16.0))
-                  ],
-                ),
-              ),
-            ),
-            Center(
-              child: IconButton(
-                iconSize: 36.0,
-                color: Colors.white,
-                icon: Icon(Icons.play_circle_filled),
-                onPressed: () {
-                  print("Hello");
-                },
-              ),
-            )
-          ],
-        ),
+          )
+
+        ],
       ),
     );
   }

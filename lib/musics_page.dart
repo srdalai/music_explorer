@@ -3,25 +3,25 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flute_music_player/flute_music_player.dart';
+import 'package:music_explorer/models/models.dart';
 import 'package:music_explorer/music_player.dart';
 import 'package:music_explorer/widgets/inheritaedPlayer.dart';
 import 'package:music_explorer/widgets/miniPlayer.dart';
 import 'package:music_explorer/main_page.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class MusicsPage extends StatefulWidget {
-  //MusicsPage();
   @override
   _MusicsPageState createState() => _MusicsPageState();
 }
 
 class _MusicsPageState extends State<MusicsPage> {
   List<Song> _songs;
-  Song _song;
+  Song nSong;
   MusicFinder audioPlayer;
   bool isPlaying = false;
   bool isLoded = false;
   StreamController<Song> controller;
-  
 
   @override
   void initState() {
@@ -35,10 +35,10 @@ class _MusicsPageState extends State<MusicsPage> {
 
   @override
   void dispose() {
-      // TODO: implement dispose
-      controller.close();
-      super.dispose();
-    }
+    // TODO: implement dispose
+    controller.close();
+    super.dispose();
+  }
 
   void initPlayer() async {
     audioPlayer = new MusicFinder();
@@ -47,11 +47,10 @@ class _MusicsPageState extends State<MusicsPage> {
 
     setState(() {
       _songs = songs;
+      nSong = songs[0];
       isLoded = true;
     });
   }
-
-  final number = new ValueNotifier(0);
 
   @override
   Widget build(BuildContext context) {
@@ -60,10 +59,15 @@ class _MusicsPageState extends State<MusicsPage> {
         alignment: Alignment.bottomCenter,
         children: <Widget>[
           isLoded ? buildGridView() : Container(),
-          SizedBox(
-            height: 60.0,
-            child: isPlaying ? MiniPlayer(song: _song, streamController: controller,) : Container(),
-          )
+          // ScopedModelDescendant<SongModel>(
+          //   builder: (context, _, model) {
+          //     isPlaying = true;
+          //     return SizedBox(
+          //       height: 60.0,
+          //       child: isPlaying ? MiniPlayer(song: model.song, streamController: controller,) : Container(),
+          //     );
+          //   },
+          // )
         ],
       ),
     );
@@ -82,24 +86,27 @@ class _MusicsPageState extends State<MusicsPage> {
 
   Padding buildPadding(double width, int index) {
     return Padding(
-        padding: EdgeInsets.all(10.0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8.0),
-          child: Stack(
-            alignment: Alignment.bottomCenter,
-            children: <Widget>[
-              SizedBox(
-                width: width * 0.50,
-                height: width * 0.50,
-                child: Material(
-                  child: InkWell(
-                    splashColor: Colors.redAccent,
+      padding: EdgeInsets.all(10.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8.0),
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: <Widget>[
+            SizedBox(
+              width: width * 0.50,
+              height: width * 0.50,
+              child: Material(child: ScopedModelDescendant<SongModel>(
+                builder: (context, _, model) {
+                  return InkWell(
+                    splashColor: Colors.grey.shade300,
                     onTap: () {
+                      model.changeSong(_songs[index]);
                       controller.sink.add(_songs[index]);
-                      
+                      nSong = _songs[index];
+
                       setState(() {
                         isPlaying = true;
-                        _song = _songs[index];
+                        nSong = _songs[index];
                       });
                       // Navigator.of(context).push(MaterialPageRoute(
                       //     builder: (context) => MusicPlayer(
@@ -110,56 +117,34 @@ class _MusicsPageState extends State<MusicsPage> {
                         ? Image.asset("assets/selena.jpg", fit: BoxFit.cover)
                         : Image.file(File(_songs[index].albumArt),
                             fit: BoxFit.cover),
+                  );
+                },
+              )),
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              color: Colors.black.withOpacity(0.5),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Text(
+                    _songs[index].title,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold),
                   ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                color: Colors.black.withOpacity(0.5),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Text(
-                      _songs[index].title,
+                  Text(_songs[index].artist,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    Text(_songs[index].artist,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: Colors.white, fontSize: 14.0))
-                  ],
-                ),
-              )
-            ],
-          ),
+                      style: TextStyle(color: Colors.white, fontSize: 14.0))
+                ],
+              ),
+            )
+          ],
         ),
-      );
-  }
-
-  ListView buildListView() {
-    return ListView.builder(
-      itemCount: _songs.length,
-      itemBuilder: (context, index) {
-        return ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.grey,
-              child: Text(_songs[index].title[0]),
-            ),
-            title: Text(
-              _songs[index].title,
-              style: TextStyle(color: Colors.white),
-            ),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => MusicPlayer(
-                        song: _songs[index],
-                      )));
-            });
-      },
+      ),
     );
   }
 }

@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flute_music_player/flute_music_player.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:music_explorer/main_page.dart';
 import 'package:music_explorer/widgets/playPauseButton.dart';
 import 'package:simple_coverflow/simple_coverflow.dart';
 import 'package:audioplayer/audioplayer.dart';
@@ -48,17 +49,16 @@ class _MiniPlayerState extends State<MiniPlayer> {
 
   bool isMuted = false;
 
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _song = widget.song;
-    
+  
     _streamController = widget.streamController;
     _streamController.stream.listen((song) {
       print(song.title);
-      //_stop();
-      //disVow();
       changeSong(song);
     });
     initAudioPlayer();
@@ -70,21 +70,15 @@ class _MiniPlayerState extends State<MiniPlayer> {
       _song = song;
     });
     _playLocal();
-    //initAudioPlayer();
   }
 
   @override
   void dispose() {
     _positionSubscription.cancel();
     _audioPlayerStateSubscription.cancel();
+    _streamController.close();
     audioPlayer.stop();
     super.dispose();
-  }
-
-  void disVow() {
-    _positionSubscription.cancel();
-    _audioPlayerStateSubscription.cancel();
-    audioPlayer.stop();
   }
 
   Future _playLocal() async {
@@ -164,6 +158,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
       },
     );
   }
+
 
   Widget bottomPlayer(Song nowSong) {
     return Material(
