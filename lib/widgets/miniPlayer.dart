@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flute_music_player/flute_music_player.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_coverflow/simple_coverflow.dart';
 import 'package:audioplayer/audioplayer.dart';
 
@@ -63,11 +65,33 @@ class _MiniPlayerState extends State<MiniPlayer> {
   }
 
   void changeSong(Song song) {
-    _stop();
+    if (playerState != PlayerState.stopped) {
+      _stop();
+    }
     setState(() {
       _song = song;
     });
     _playLocal();
+    upadateSP(song);
+  }
+
+  SharedPreferences sharedPreferences;
+  void upadateSP(Song changedSong) async {
+    sharedPreferences = await SharedPreferences.getInstance();
+
+    Map<String, dynamic> songData = new Map();
+    songData.putIfAbsent("id", () => changedSong.id);
+    songData.putIfAbsent("artist", () => changedSong.artist);
+    songData.putIfAbsent("title", () => changedSong.title);
+    songData.putIfAbsent("album", () => changedSong.album);
+    songData.putIfAbsent("albumId", () => changedSong.albumId);
+    songData.putIfAbsent("duration", () => changedSong.duration);
+    songData.putIfAbsent("uri", () => changedSong.uri);
+    songData.putIfAbsent("albumArt", () => changedSong.albumArt);
+    
+    String songString = json.encode(songData);
+
+    await sharedPreferences.setString("songString", songString);
   }
 
   @override
@@ -141,7 +165,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
       });
     });
 
-    _playLocal();
+    //_playLocal();
   }
 
   @override

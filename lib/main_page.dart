@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flute_music_player/flute_music_player.dart';
 import 'package:flutter/material.dart';
@@ -92,13 +93,39 @@ class NewHomePage extends StatefulWidget {
 
 class NewHomePageState extends State<NewHomePage> {
   StreamController<Song> controller;
-  Song song = new Song(1, "artist", "title", "album", 12, 123, "uri", "albumArt");
+  Song song;
+  bool isLoded = false;
+  SharedPreferences sharedPreferences;
+
+  void getDataFromSP() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+
+    String songString = sharedPreferences.getString("songString");
+
+    Map<String, dynamic> songData = json.decode(songString);
+
+    Song _song = new Song(
+      songData['id'],
+      songData['artist'],
+      songData['title'],
+      songData['album'],
+      songData['albumId'],
+      songData['duration'],
+      songData['uri'],
+      songData['albumArt'],
+    );
+
+    setState(() {
+          song = _song;
+        });
+  }
 
   @override
   void initState() {
       // TODO: implement initState
       super.initState();
       controller = new StreamController.broadcast();
+      getDataFromSP();
     }
 
   @override
