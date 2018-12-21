@@ -11,6 +11,9 @@ import 'package:music_explorer/main_page.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class MusicsPage extends StatefulWidget {
+
+  final StreamController<Song> controller;
+  MusicsPage({this.controller});
   @override
   _MusicsPageState createState() => _MusicsPageState();
 }
@@ -21,7 +24,7 @@ class _MusicsPageState extends State<MusicsPage> {
   MusicFinder audioPlayer;
   bool isPlaying = false;
   bool isLoded = false;
-  StreamController<Song> controller;
+  StreamController<Song> _controller;
 
   @override
   void initState() {
@@ -29,14 +32,15 @@ class _MusicsPageState extends State<MusicsPage> {
     super.initState();
     isPlaying = false;
     isLoded = false;
-    controller = new StreamController.broadcast();
+    //_controller = new StreamController.broadcast();
+    _controller = widget.controller;
     initPlayer();
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
-    controller.close();
+    _controller.close();
     super.dispose();
   }
 
@@ -101,7 +105,7 @@ class _MusicsPageState extends State<MusicsPage> {
                     splashColor: Colors.grey.shade300,
                     onTap: () {
                       model.changeSong(_songs[index]);
-                      controller.sink.add(_songs[index]);
+                      _controller.sink.add(_songs[index]);
                       nSong = _songs[index];
 
                       setState(() {

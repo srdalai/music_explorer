@@ -32,7 +32,7 @@ class MusicExplorer extends StatelessWidget {
             primarySwatch: Colors.blueGrey,
             primaryIconTheme: IconThemeData(color: Colors.white),
             primaryTextTheme: Typography.whiteMountainView),
-        home: MainPage(),
+        home: NewHomePage(),
       ),
     );
   }
