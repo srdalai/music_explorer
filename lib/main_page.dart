@@ -3,12 +3,10 @@ import 'dart:async';
 import 'package:flute_music_player/flute_music_player.dart';
 import 'package:flutter/material.dart';
 import 'package:music_explorer/home_page.dart';
-import 'package:music_explorer/models/models.dart';
 import 'package:music_explorer/musics_page.dart';
 import 'package:music_explorer/profile_page.dart';
 import 'package:music_explorer/search_page.dart';
 import 'package:music_explorer/widgets/miniPlayer.dart';
-import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MainPage extends StatefulWidget {
@@ -94,6 +92,7 @@ class NewHomePage extends StatefulWidget {
 
 class NewHomePageState extends State<NewHomePage> {
   StreamController<Song> controller;
+  Song song = new Song(1, "artist", "title", "album", 12, 123, "uri", "albumArt");
 
   @override
   void initState() {
@@ -118,16 +117,8 @@ class NewHomePageState extends State<NewHomePage> {
           MainPage(controller: controller,),
           Container(
             margin: EdgeInsets.only(bottom: 56.0),
-            child: ScopedModelDescendant<SongModel>(
-              rebuildOnChange: false,
-              builder: (context, _, model) {
-                print(model.song.title);
-                controller.sink.add(model.song);
-                return MiniPlayer(song: model.song, streamController: controller);
-              },
+            child: MiniPlayer(song: song, streamController: controller)
             ),
-          )
-
         ],
       ),
     );

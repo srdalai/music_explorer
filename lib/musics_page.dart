@@ -1,17 +1,10 @@
-import 'dart:io';
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flute_music_player/flute_music_player.dart';
-import 'package:music_explorer/models/models.dart';
-import 'package:music_explorer/music_player.dart';
-import 'package:music_explorer/widgets/inheritaedPlayer.dart';
-import 'package:music_explorer/widgets/miniPlayer.dart';
-import 'package:music_explorer/main_page.dart';
-import 'package:scoped_model/scoped_model.dart';
 
 class MusicsPage extends StatefulWidget {
-
   final StreamController<Song> controller;
   MusicsPage({this.controller});
   @override
@@ -85,24 +78,20 @@ class _MusicsPageState extends State<MusicsPage> {
             SizedBox(
               width: width * 0.50,
               height: width * 0.50,
-              child: Material(child: ScopedModelDescendant<SongModel>(
-                builder: (context, _, model) {
-                  return InkWell(
-                    splashColor: Colors.grey.shade300,
-                    onTap: () {
-                      model.changeSong(_songs[index]);
-                      _controller.sink.add(_songs[index]);
-                      
-                      // Navigator.of(context).push(MaterialPageRoute(
-                      //     builder: (context) => MusicPlayer(
-                      //           song: _songs[index],
-                      //         )));
-                    },
-                    child: _songs[index].albumArt == null
-                        ? Image.asset("assets/selena.jpg", fit: BoxFit.cover)
-                        : Image.file(File(_songs[index].albumArt),
-                            fit: BoxFit.cover),
-                  );
+              child: Material(
+                  child: InkWell(
+                child: _songs[index].albumArt == null
+                    ? Image.asset("assets/selena.jpg", fit: BoxFit.cover)
+                    : Image.file(File(_songs[index].albumArt),
+                        fit: BoxFit.cover),
+                splashColor: Colors.grey.shade300,
+                onTap: () {
+                  _controller.sink.add(_songs[index]);
+
+                  // Navigator.of(context).push(MaterialPageRoute(
+                  //     builder: (context) => MusicPlayer(
+                  //           song: _songs[index],
+                  //         )));
                 },
               )),
             ),

@@ -4,8 +4,6 @@ import 'dart:async';
 import 'package:flute_music_player/flute_music_player.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:music_explorer/main_page.dart';
-import 'package:music_explorer/widgets/playPauseButton.dart';
 import 'package:simple_coverflow/simple_coverflow.dart';
 import 'package:audioplayer/audioplayer.dart';
 
