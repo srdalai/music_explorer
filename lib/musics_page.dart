@@ -20,9 +20,7 @@ class MusicsPage extends StatefulWidget {
 
 class _MusicsPageState extends State<MusicsPage> {
   List<Song> _songs;
-  Song nSong;
   MusicFinder audioPlayer;
-  bool isPlaying = false;
   bool isLoded = false;
   StreamController<Song> _controller;
 
@@ -30,9 +28,7 @@ class _MusicsPageState extends State<MusicsPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    isPlaying = false;
     isLoded = false;
-    //_controller = new StreamController.broadcast();
     _controller = widget.controller;
     initPlayer();
   }
@@ -51,7 +47,6 @@ class _MusicsPageState extends State<MusicsPage> {
 
     setState(() {
       _songs = songs;
-      nSong = songs[0];
       isLoded = true;
     });
   }
@@ -63,15 +58,6 @@ class _MusicsPageState extends State<MusicsPage> {
         alignment: Alignment.bottomCenter,
         children: <Widget>[
           isLoded ? buildGridView() : Container(),
-          // ScopedModelDescendant<SongModel>(
-          //   builder: (context, _, model) {
-          //     isPlaying = true;
-          //     return SizedBox(
-          //       height: 60.0,
-          //       child: isPlaying ? MiniPlayer(song: model.song, streamController: controller,) : Container(),
-          //     );
-          //   },
-          // )
         ],
       ),
     );
@@ -106,12 +92,7 @@ class _MusicsPageState extends State<MusicsPage> {
                     onTap: () {
                       model.changeSong(_songs[index]);
                       _controller.sink.add(_songs[index]);
-                      nSong = _songs[index];
-
-                      setState(() {
-                        isPlaying = true;
-                        nSong = _songs[index];
-                      });
+                      
                       // Navigator.of(context).push(MaterialPageRoute(
                       //     builder: (context) => MusicPlayer(
                       //           song: _songs[index],
