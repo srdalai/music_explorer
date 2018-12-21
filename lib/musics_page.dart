@@ -38,6 +38,8 @@ class _MusicsPageState extends State<MusicsPage> {
     List<Song> songs = await MusicFinder.allSongs();
     songs = List.from(songs);
 
+    songs.sort((songA, songB) => songA.title.toLowerCase().compareTo(songB.title.toLowerCase()));
+
     setState(() {
       _songs = songs;
       isLoded = true;
