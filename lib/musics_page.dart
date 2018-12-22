@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flute_music_player/flute_music_player.dart';
+import 'package:music_explorer/models/database.dart';
 
 class MusicsPage extends StatefulWidget {
   final StreamController<Song> controller;
@@ -16,6 +17,7 @@ class _MusicsPageState extends State<MusicsPage> {
   MusicFinder audioPlayer;
   bool isLoded = false;
   StreamController<Song> _controller;
+  List<Song> songsFromDB;
 
   @override
   void initState() {
@@ -23,6 +25,7 @@ class _MusicsPageState extends State<MusicsPage> {
     super.initState();
     isLoded = false;
     _controller = widget.controller;
+    //getSongList();
     initPlayer();
   }
 
@@ -33,15 +36,30 @@ class _MusicsPageState extends State<MusicsPage> {
     super.dispose();
   }
 
+  void getSongList() async {
+    var dbHelper = DBHelper();
+    songsFromDB = await dbHelper.getSongs();
+
+    songsFromDB = List.from(songsFromDB);
+
+    songsFromDB.sort((songA, songB) => songA.title.toLowerCase().compareTo(songB.title.toLowerCase()));
+
+    setState(() {
+      _songs = songsFromDB;
+      isLoded = true;
+    });
+  }
+
   void initPlayer() async {
     audioPlayer = new MusicFinder();
     List<Song> songs = await MusicFinder.allSongs();
     songs = List.from(songs);
 
     songs.sort((songA, songB) => songA.title.toLowerCase().compareTo(songB.title.toLowerCase()));
+    saveToDataBase(songs);
 
     setState(() {
-      _songs = songs;
+      _songs = songs;  //TODO check all song with database songs and rebuid widget if any change is there
       isLoded = true;
     });
   }
@@ -49,12 +67,7 @@ class _MusicsPageState extends State<MusicsPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Stack(
-        alignment: Alignment.bottomCenter,
-        children: <Widget>[
-          isLoded ? buildGridView() : Container(),
-        ],
-      ),
+      child: isLoded ? buildGridView() : Container(),
     );
   }
 
@@ -122,5 +135,13 @@ class _MusicsPageState extends State<MusicsPage> {
         ),
       ),
     );
+  }
+
+  void saveToDataBase(List<Song> songs) async {
+    var dbHelper = DBHelper();
+    dbHelper.deleteAllSOngs();
+    for (var song in songs) {
+      dbHelper.saveSong(song);
+    }
   }
 }
