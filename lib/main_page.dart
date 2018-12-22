@@ -93,7 +93,7 @@ class NewHomePage extends StatefulWidget {
 
 class NewHomePageState extends State<NewHomePage> {
   StreamController<Song> controller;
-  Song song;
+  Song song = new Song(0, "", "", "", 0, 0, "", "");
   bool isLoded = false;
   SharedPreferences sharedPreferences;
 
@@ -101,6 +101,7 @@ class NewHomePageState extends State<NewHomePage> {
     sharedPreferences = await SharedPreferences.getInstance();
 
     String songString = sharedPreferences.getString("songString");
+    print("SOng Data for SP"+songString);
 
     Map<String, dynamic> songData = json.decode(songString);
 
@@ -117,6 +118,7 @@ class NewHomePageState extends State<NewHomePage> {
 
     setState(() {
           song = _song;
+          isLoded = true;
         });
   }
 
